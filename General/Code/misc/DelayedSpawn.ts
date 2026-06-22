@@ -12,12 +12,12 @@ export class DelayedSpawn {
     public get Prefab() : Prefab { return this.prefab; }
     
 
-    public spawn(parent: Node, onComplete: (ins: Node) => void = null) {
+    public spawn(parent: Node, onComplete: () => void = null) {
         GameSheduler.I.scheduleOnce(() => {
             const ins = instantiate(this.prefab);
             ins.setParent(parent);
 
-            if (onComplete) onComplete(ins);
+            if (onComplete) onComplete();
         }, this.delay);
     }
 }

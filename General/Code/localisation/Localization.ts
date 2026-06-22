@@ -1,5 +1,4 @@
-﻿import { _decorator, log } from 'cc';
-const { ccclass, property, disallowMultiple } = _decorator;
+﻿import { log } from 'cc';
 
 declare global {
     interface Window {
@@ -37,8 +36,6 @@ export class LangData {
 }
 
 
-@ccclass('Localization')
-@disallowMultiple
 export class Localization {
     public static get CurrentLang(): LangCode { return Localization._currentLang; }
     public static get DATA(): LangData { return Localization._data; }

@@ -1,4 +1,4 @@
-import { _decorator, CCBoolean, Component, log, math, Vec2, Vec3} from 'cc';
+import { _decorator, CCBoolean, Component, math, Vec2, Vec3} from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('LimitPosition2D')
@@ -16,7 +16,7 @@ export class LimitPosition2D extends Component {
     private _pos: Vec3 = new Vec3();
 
 
-    protected start(): void {
+    protected onLoad(): void {
         this.calcTrueLimits();
     }
 
@@ -26,9 +26,17 @@ export class LimitPosition2D extends Component {
         else 
             this.node.getPosition(this._pos); 
         
+        if (this._trueMinLimits.x > this._trueMaxLimits.x) {
+            this._pos.x = (this._trueMinLimits.x + this._trueMaxLimits.x) * .5;
+        } else {
+            this._pos.x = math.clamp(this._pos.x, this._trueMinLimits.x, this._trueMaxLimits.x);
+        }
 
-        this._pos.x = math.clamp(this._pos.x, this._trueMinLimits.x, this._trueMaxLimits.x);
-        this._pos.y = math.clamp(this._pos.y, this._trueMinLimits.y, this._trueMaxLimits.y);
+        if (this._trueMinLimits.y > this._trueMaxLimits.y) {
+            this._pos.y = (this._trueMinLimits.y + this._trueMaxLimits.y) * .5;
+        } else {
+            this._pos.y = math.clamp(this._pos.y, this._trueMinLimits.y, this._trueMaxLimits.y);
+        }
         
         
         if (this.worldSpace) 
@@ -43,14 +51,16 @@ export class LimitPosition2D extends Component {
     }
     
     public setSize(value: Vec2) { 
-        this.setSize2f(value.x, value.y);
+        this._size.set(value);
+
+        this.calcTrueLimits()
     }
 
     public setSize2f(x: number, y: number) { 
-        this._size.set(x, y);
-        this._halfSize = this._size.clone().divide2f(2, 2);
-
-        this.calcTrueLimits();
+        this._size.x = x;
+        this._size.y = y;
+        
+        this.calcTrueLimits()
     }
 
     
@@ -59,13 +69,16 @@ export class LimitPosition2D extends Component {
     }
     
     public setMinLimits(value: Vec2) { 
-        this.setMinLimits2f(value.x, value.y);
+        this._minLimits.set(value);
+
+        this.calcTrueLimits()
     }
 
     public setMinLimits2f(x: number, y: number) { 
-        this._minLimits.set(x, y);
-
-        this.calcTrueLimits();
+        this._minLimits.x = x;
+        this._minLimits.y = y;
+        
+        this.calcTrueLimits()
     }
     
     
@@ -74,31 +87,38 @@ export class LimitPosition2D extends Component {
     }
     
     public setMaxLimits(value: Vec2) { 
-        this.setMaxLimits2f(value.x, value.y);
+        this._maxLimits.set(value);
+
+        this.calcTrueLimits()
     }
 
     public setMaxLimits2f(x: number, y: number) { 
-        this._maxLimits.set(x, y);
+        this._maxLimits.x = x;
+        this._maxLimits.y = y;
+        
+        this.calcTrueLimits()
+    }
+    
+    public setMaxLimitX(x: number) { 
+        this._maxLimits.x = x;
+        
+        this.calcTrueLimits()
+    }
 
+    public setMaxLimitY(y: number) { 
+        this._maxLimits.y = y;
+        
         this.calcTrueLimits()
     }
 
 
     private calcTrueLimits() {
+        this._halfSize.set(this._size).multiplyScalar(0.5);
+        
         this._trueMinLimits.x = this._minLimits.x + this._halfSize.x;
         this._trueMinLimits.y = this._minLimits.y + this._halfSize.y;
 
         this._trueMaxLimits.x = this._maxLimits.x - this._halfSize.x;
         this._trueMaxLimits.y = this._maxLimits.y - this._halfSize.y;
-        
-        if (this._trueMinLimits.x > this._trueMaxLimits.x) {
-            const mid = (this._trueMinLimits.x + this._trueMaxLimits.x) / 2;
-            this._trueMinLimits.x = this._trueMaxLimits.x = mid;
-        }
-
-        if (this._trueMinLimits.y > this._trueMaxLimits.y) {
-            const mid = (this._trueMinLimits.y + this._trueMaxLimits.y) / 2;
-            this._trueMinLimits.y = this._trueMaxLimits.y = mid;
-        }
     }
 }

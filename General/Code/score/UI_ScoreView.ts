@@ -2,7 +2,7 @@ import { _decorator, CCString, Component, Label, tween, CCFloat, CCInteger, CCBo
 import { Score } from './Score';
 const { ccclass, property, requireComponent } = _decorator;
 
-@ccclass('UI_ScoreView')
+@ccclass('UI_ScoreLabel')
 @requireComponent(Label)
 export class UI_ScoreLabel extends Component {
     @property(CCBoolean) bonusView: boolean = false;
@@ -12,7 +12,6 @@ export class UI_ScoreLabel extends Component {
     @property(CCInteger) extraDigitsRound: number = 0;
 
     private _label: Label = null;
-    private animScore: { value: number } = null;
 
 
     protected onLoad(): void {
@@ -23,22 +22,21 @@ export class UI_ScoreLabel extends Component {
         } else {
             Score.Events.on(Score.EventType.SCORE_CHANGED, this.set, this);
         }
-        
     }
 
     protected start(): void {
         if (this.bonusView) {
-            this.animScore = { value: Score.getBonus() };
             this.set(0, Score.getBonus());
         } else {
-            this.animScore = { value: Score.get() };
             this.set(0, Score.get());
         }
     }
 
     
     private set(curScore: number, newScore: number): void {
-        tween(this.animScore)
+        let animScore = { value: curScore };
+        
+        tween(animScore)
             .to(this.animDuration, { value: newScore }, {
                 onUpdate: ( target: { value: number }) => {
                     if (this._label) 

@@ -16,7 +16,13 @@ enum TargetApp {
 }
 
 export class super_html_playable {
+    private _lastDownloadTs = 0;
+
     public download() {
+        const now = Date.now();
+        if (now - this._lastDownloadTs < 500) return;
+        this._lastDownloadTs = now;
+
         const GOOGLE_URL = window.GOOGLE_PLAY_URL || BASE_GOOGLE_LINK; 
         const APP_STORE_URL = window.APP_STORE_URL || BASE_APP_STORE_LINK; 
         
@@ -28,21 +34,34 @@ export class super_html_playable {
             console.log("download");
             
             let url: string;
-            let platform: TargetApp;
+            let platform: TargetApp = this.getTargetApp();
 
-            switch(platform = this.getTargetApp()) {
-                case TargetApp.GOOGLE:    this.html_set_app_store_url(url = GOOGLE_URL); break;
-                case TargetApp.APP_STORE: this.html_set_google_play_url(url = APP_STORE_URL); break;
+            if (platform === TargetApp.APP_STORE) {
+                this.html_set_app_store_url(url = APP_STORE_URL);
+            } else {
+                this.html_set_google_play_url(url = GOOGLE_URL);
             }
             
             console.log(`Opening store for ${TargetApp[platform]}: ${url}`);
-            this.safeOpen(url);
+            if (url.trim() != "" && !this.isVungleEnvironment()) this.safeOpen(url);
             
             this.html_game_download();
         }
     }
     
+    
 
+    private isVungleEnvironment(): boolean {
+        const ua = (navigator.userAgent || "").toLowerCase();
+        const w = window as unknown as Record<string, unknown>;
+        return (
+            ua.includes("vungle") ||
+            typeof w["vungle"] !== "undefined" ||
+            typeof w["Vungle"] !== "undefined" ||
+            typeof w["vunglePlayable"] !== "undefined" ||
+            typeof w["VunglePlayable"] !== "undefined"
+        );
+    }
 
     private safeOpen(url: string): void {
         try {

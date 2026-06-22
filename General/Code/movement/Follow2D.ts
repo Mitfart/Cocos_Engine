@@ -6,6 +6,9 @@ export class Follow2D extends Component {
     @property(Node) private target: Node;
     @property(Vec3) offset: Vec3 = new Vec3;
 
+    @property(CCBoolean) smoothFollow: boolean = true;
+    @property({ type: CCFloat, visible() { return this.smoothFollow }, }) followSpeed = 5;
+
     private _targetPos: Vec3 = new Vec3;
     private _pos: Vec3 = new Vec3;
 
@@ -23,8 +26,8 @@ export class Follow2D extends Component {
                 : this.target 
                     ? this.target.worldPosition.clone()
                     : this.node.worldPosition;
+        this._pos = this._targetPos.clone().add(this.offset);
 
-        this._pos.set(this._targetPos.clone().add(this.offset));
         this.node.setWorldPosition(this._pos);
         
         this.target = newTarget;
@@ -34,14 +37,17 @@ export class Follow2D extends Component {
     protected lateUpdate(dt: number): void {
         if (this.target && this.target.isValid) {
             this.target.getWorldPosition(this._targetPos);
-            this._targetPos.add(this.offset.clone().multiply3f(
-                Math.sign(this.target.worldScale.x),
-                Math.sign(this.target.worldScale.y),
-                Math.sign(this.target.worldScale.z),
-            ));
+            this._targetPos.add(this.offset);
         }
         
-        this._pos.set(this._targetPos);
+        if (!this.smoothFollow) {
+            this._pos = this._targetPos;
+        } else {
+            this.node.getWorldPosition(this._pos);
+
+            Vec3.moveTowards(this._pos, this._pos, this._targetPos, this.followSpeed * dt);
+        }
+        
         this.node.setWorldPosition(this._pos);
     }
 }

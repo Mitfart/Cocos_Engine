@@ -1,4 +1,4 @@
-import { _decorator, Node, log, screen, UITransform, Vec2, Vec3, view, CCBoolean} from 'cc';
+import { _decorator, UITransform, Vec2, view} from 'cc';
 import { LimitPosition2D } from './LimitPosition2D';
 import { OrientationSwitch } from '../adaptive/OrientationSwitch';
 const { ccclass, property } = _decorator;
@@ -13,6 +13,7 @@ export class LimitCamera extends OrientationSwitch {
     protected onLoad(): void {
         this._limit = this.node.addComponent(LimitPosition2D);
         this._limit.worldSpace = true;
+        this._limit.setMinLimits(Vec2.ZERO);
 
         super.onLoad();
     }
@@ -20,23 +21,20 @@ export class LimitCamera extends OrientationSwitch {
     protected applyOrientation(isPortrait: boolean): void {
         const v = view.getVisibleSize();
         this._limit.setSize2f(v.width, v.height);
-        
-        const halfSize = (this.level && this.level.contentSize 
-            ? new Vec2(this.level.contentSize.width, this.level.contentSize.height,)
-            : new Vec2(v.width, v.height)
-        ).multiply2f(
-            this.level.node.worldScale.x / 2,
-            this.level.node.worldScale.y / 2
-        );
 
-        this._limit.setMinLimits2f(
-            this.level.node.worldPositionX - halfSize.x,
-            this.level.node.worldPositionY - halfSize.y
-        );
+        if (this.level) {
+            let width = this.level.contentSize.width * this.level.node.worldScale.x + this.level.node.worldPositionX;
+            let height = this.level.contentSize.height * this.level.node.worldScale.y + this.level.node.worldPositionY;
 
-        this._limit.setMaxLimits2f(
-            Math.max(v.width, this.level.node.worldPositionX + halfSize.x), 
-            Math.max(v.height, this.level.node.worldPositionY + halfSize.y), 
-        );
+            this._limit.setMaxLimits2f(
+                Math.max(v.width, width), 
+                Math.max(v.height, height), 
+            );
+        } else {
+            this._limit.setMaxLimits2f(
+                v.width, 
+                v.height, 
+            );
+        }
     }
 }
