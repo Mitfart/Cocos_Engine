@@ -7,8 +7,8 @@ declare global {
     }
 }
 
-const BASE_APP_STORE_LINK = "";
-const BASE_GOOGLE_LINK = "";
+const BASE_APP_STORE_LINK = "https://apps.apple.com/us/app/color-fill-3d/id1473024868";
+const BASE_GOOGLE_LINK = "https://play.google.com/store/apps/details?id=com.gjg.colorfill3d";
 
 enum TargetApp {
     GOOGLE,
