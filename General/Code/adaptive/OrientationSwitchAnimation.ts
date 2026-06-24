@@ -4,8 +4,8 @@ const { ccclass, property } = _decorator;
 
 @ccclass('OrientationSwitchAnimation')
 export class OrientationSwitchAnimation extends OrientationSwitch {
-    @property(AnimationComponent) anim_ver: AnimationComponent = null;
-    @property(AnimationComponent) anim_hor: AnimationComponent = null;
+    @property(AnimationComponent) private anim_ver: AnimationComponent = null;
+    @property(AnimationComponent) private anim_hor: AnimationComponent = null;
     
 
     protected override applyOrientation(isPortrait: boolean): void {
