@@ -73,10 +73,9 @@ export class UI_Screen extends Component {
     
     public hide(instantly: boolean = false, onComplete: () => void = null) { 
         if (!instantly) {
-            const hideDuration = this.animDuration * 1.5;
             tween(this.animView)
                 .set({ scale: this._maxScale })
-                .to(hideDuration, { scale: this._minScale }, { easing: easing.sineInOut })
+                .to(this.animDuration, { scale: this._minScale }, { easing: easing.backIn })
                 .call(() => {
                     this.node.active = false;
                     if (onComplete) onComplete();
@@ -87,13 +86,13 @@ export class UI_Screen extends Component {
             if (this.tweenPos) {
                 tween(this.animView)
                     .set({ position: this.showTargetPos })
-                    .to(hideDuration, { position: this.hideTargetPos }, { easing: easing.sineInOut })
+                    .to(this.animDuration, { position: this.hideTargetPos }, { easing: easing.backIn })
                     .start();
             }
             
             if (this.withBackground) {
                 tween(this.background)
-                    .to(hideDuration, { opacity: 0 }, { easing: easing.sineInOut })
+                    .to(this.animDuration, { opacity: 0 }, { easing: easing.backIn })
                     .start();
             }
         } else {

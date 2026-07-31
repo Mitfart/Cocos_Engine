@@ -1,5 +1,4 @@
 import { sys } from "cc";
-import { AnalyticEvents, Analytics } from "db://assets/Code/Infrastructure/Services/Analytics";
 
 declare global {
     interface Window {
@@ -23,8 +22,6 @@ export class super_html_playable {
         const now = Date.now();
         if (now - this._lastDownloadTs < 500) return;
         this._lastDownloadTs = now;
-
-        Analytics.emit(AnalyticEvents.CTA_CLICKED);
 
         const GOOGLE_URL = window.GOOGLE_PLAY_URL || BASE_GOOGLE_LINK; 
         const APP_STORE_URL = window.APP_STORE_URL || BASE_APP_STORE_LINK; 
