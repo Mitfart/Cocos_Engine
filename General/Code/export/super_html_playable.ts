@@ -4,11 +4,29 @@ declare global {
     interface Window {
         APP_STORE_URL?: string;
         GOOGLE_PLAY_URL?: string;
+        ALPlayableAnalytics?: {
+            trackEvent: (eventName: string) => void;
+        };
     }
 }
 
-const BASE_APP_STORE_LINK = "https://apps.apple.com/us/app/color-fill-3d/id1473024868";
-const BASE_GOOGLE_LINK = "https://play.google.com/store/apps/details?id=com.gjg.colorfill3d";
+export enum PlayableAnalyticsEvent {
+    LOADING = 'LOADING',
+    LOADED = 'LOADED',
+    DISPLAYED = 'DISPLAYED',
+    CHALLENGE_STARTED = 'CHALLENGE_STARTED',
+    CHALLENGE_FAILED = 'CHALLENGE_FAILED',
+    CHALLENGE_RETRY = 'CHALLENGE_RETRY',
+    CHALLENGE_PASS_25 = 'CHALLENGE_PASS_25',
+    CHALLENGE_PASS_50 = 'CHALLENGE_PASS_50',
+    CHALLENGE_PASS_75 = 'CHALLENGE_PASS_75',
+    CHALLENGE_SOLVED = 'CHALLENGE_SOLVED',
+    ENDCARD_SHOWN = 'ENDCARD_SHOWN',
+    CTA_CLICKED = 'CTA_CLICKED',
+}
+
+const BASE_APP_STORE_LINK = "https://apps.apple.com/us/app/tomb-of-the-mask-pixel-maze/id1057889290";
+const BASE_GOOGLE_LINK = "https://play.google.com/store/apps/details?gl=US&hl=en-US&id=com.playgendary.tom";
 
 enum TargetApp {
     GOOGLE,
@@ -17,11 +35,24 @@ enum TargetApp {
 
 export class super_html_playable {
     private _lastDownloadTs = 0;
+    private readonly emittedEvents = new Set<PlayableAnalyticsEvent>();
+
+    public trackEvent(eventName: PlayableAnalyticsEvent): void {
+        if (eventName !== PlayableAnalyticsEvent.CTA_CLICKED) {
+            if (this.emittedEvents.has(eventName)) return;
+            this.emittedEvents.add(eventName);
+        }
+
+        window.ALPlayableAnalytics?.trackEvent(eventName);
+        window.dispatchEvent(new CustomEvent(eventName));
+        console.log(`[Analytics] ${eventName}`);
+    }
 
     public download() {
         const now = Date.now();
         if (now - this._lastDownloadTs < 500) return;
         this._lastDownloadTs = now;
+        this.trackEvent(PlayableAnalyticsEvent.CTA_CLICKED);
 
         const GOOGLE_URL = window.GOOGLE_PLAY_URL || BASE_GOOGLE_LINK; 
         const APP_STORE_URL = window.APP_STORE_URL || BASE_APP_STORE_LINK; 
