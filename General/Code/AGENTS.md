@@ -7,13 +7,15 @@ Reusable Cocos Creator TypeScript components.
 ## Ownership
 
 - `adaptive/` — orientation and responsive layout helpers.
-- `export/` — playable/export and download-button helpers.
-- `limit/` — camera/position clamps.
+- `export/` — playable/export, download-button, and deduplicated `ALPlayableAnalytics` event helpers.
+- `grid/` — grid-coordinate services; `GridService.configure` accepts an optional world offset for positioned level instances.
+- `limit/ — camera/position clamps.
 - `localisation/` — localization data and localized renderers.
 - `misc/` — small utility components.
-- `movement/` — movement/follow helpers.
+- `movement/` — movement/follow helpers; `Follow2D` uses smoothed target velocity for bounded speed-based look-ahead and independently lockable world X/Y axes; this project defaults to locked X.
 - `score/` — score model/display helpers.
-- `ui/` — generic UI component helpers.
+- `tile/` — tile renderers and views.
+- `ui/ — generic UI component helpers.
 
 ## Local Contracts
 
